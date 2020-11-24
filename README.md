@@ -7,8 +7,13 @@ Use Cockpit and Twig together.
 - http://twig.sensiolabs.org
 
 ### Installation
+Clone the repo:
 
-1. Download zip and unpack to 'your_cockpit_folder/modules/addons/twig'.
+```git clone https://github.com/rensite/cockpit-twig your_cockpit_folder/modules/addons/Twig` 
+
+Or
+
+1. Download zip and unpack to 'your_cockpit_folder/addons/Twig'.
 2. Make sure you require 'your_cockpit_folder/bootstrap.php'.
 3. Hook up your Twig_Environment to the module.
 
@@ -22,19 +27,40 @@ Use Cockpit and Twig together.
 
 ```php
 define('DOCROOT', $_SERVER['DOCUMENT_ROOT']);
-require_once('vendor/autoload.php'); // If you're using composer.
-require_once('cockpit/bootstrap.php');
+require_once('./vendor/autoload.php'); // If you're using composer.
+require_once('./cockpit-master/bootstrap.php');
 
-// Setup Twig templating engine
-$loader = new Twig_Loader_Filesystem(DOCROOT . '/templates');
-$twig = new Twig_Environment($loader, array(
-  'cache' => DOCROOT . '/cache',
+$loader = new \Twig\Loader\FilesystemLoader(DOCROOT . '/templates');
+$twig = new \Twig\Environment($loader, array(
+  'cache' => DOCROOT . '/cache', // turns on cache
 ));
 
 cockpit('twig')->use($twig);
 
-$template = $twig->loadTemplate('index.twig'); // Make sure '/templates/index.twig' exists.
+// Make sure '/templates/index.twig' exists.
+$template = $twig->load('index.twig');
 echo $template->render();
+```
+### Debug mode
+
+In case you need to use `dump()` method in yout twig templates.
+
+```php
+$twig = new \Twig\Environment($loader, array(
+  'debug' => true,
+));
+
+$twig->addExtension(new \Twig\Extension\DebugExtension()); 
+```
+
+### Use with cache
+
+To enable page caching:
+
+```php
+$twig = new \Twig\Environment($loader, array(
+  'cache' => DOCROOT . '/cache', // turns on cache
+));
 ```
 
 ### Usage
@@ -57,18 +83,18 @@ Query a collection:
 {% endfor %}
 ```
 
-#### Regions
+#### Singletons
 
-Render the entire region, with template:
+Render the entire singleton, with template:
 
 ```php
-{{ region('info') }}
+{{ singleton('info') }}
 ```
 
 Render one field:
 
 ```php
-{{ region_field('info', 'title') }}
+{{ singleton_field('info', 'title') }}
 ```
 
 Parameters are: region name & field name.
